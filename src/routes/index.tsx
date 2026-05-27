@@ -76,19 +76,19 @@ const lowStock = [
 function Metric({ label, value, delta, positive, icon: Icon, accent }: any) {
   return (
     <Card className="rounded-2xl border-slate-200 shadow-sm">
-      <CardContent className="p-5">
-        <div className="flex items-start justify-between">
-          <div>
-            <p className="text-xs text-slate-500 font-medium">{label}</p>
-            <p className="text-2xl font-semibold mt-1 tracking-tight">{value}</p>
+      <CardContent className="p-3 sm:p-5">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <p className="text-[11px] sm:text-xs text-slate-500 font-medium truncate">{label}</p>
+            <p className="text-lg sm:text-2xl font-semibold mt-1 tracking-tight truncate">{value}</p>
           </div>
-          <div className={`grid place-items-center h-10 w-10 rounded-xl ${accent}`}>
-            <Icon className="h-5 w-5" />
+          <div className={`grid place-items-center h-8 w-8 sm:h-10 sm:w-10 rounded-xl shrink-0 ${accent}`}>
+            <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
           </div>
         </div>
-        <div className={`mt-3 flex items-center gap-1 text-xs font-medium ${positive ? "text-emerald-600" : "text-red-600"}`}>
-          {positive ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}
-          {delta} <span className="text-slate-400 font-normal">vs mês anterior</span>
+        <div className={`mt-2 sm:mt-3 flex items-center gap-1 text-[10px] sm:text-xs font-medium ${positive ? "text-emerald-600" : "text-red-600"}`}>
+          {positive ? <TrendingUp className="h-3 w-3 sm:h-3.5 sm:w-3.5" /> : <TrendingDown className="h-3 w-3 sm:h-3.5 sm:w-3.5" />}
+          <span className="truncate">{delta} <span className="text-slate-400 font-normal hidden sm:inline">vs mês anterior</span></span>
         </div>
       </CardContent>
     </Card>

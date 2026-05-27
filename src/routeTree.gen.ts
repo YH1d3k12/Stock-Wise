@@ -15,7 +15,6 @@ import { Route as ProdutosRouteImport } from './routes/produtos'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as InsumosRouteImport } from './routes/insumos'
 import { Route as IaRouteImport } from './routes/ia'
-import { Route as FichasRouteImport } from './routes/fichas'
 import { Route as EstoqueRouteImport } from './routes/estoque'
 import { Route as ConfiguracoesRouteImport } from './routes/configuracoes'
 import { Route as IndexRouteImport } from './routes/index'
@@ -50,11 +49,6 @@ const IaRoute = IaRouteImport.update({
   path: '/ia',
   getParentRoute: () => rootRouteImport,
 } as any)
-const FichasRoute = FichasRouteImport.update({
-  id: '/fichas',
-  path: '/fichas',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const EstoqueRoute = EstoqueRouteImport.update({
   id: '/estoque',
   path: '/estoque',
@@ -75,7 +69,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/configuracoes': typeof ConfiguracoesRoute
   '/estoque': typeof EstoqueRoute
-  '/fichas': typeof FichasRoute
   '/ia': typeof IaRoute
   '/insumos': typeof InsumosRoute
   '/login': typeof LoginRoute
@@ -87,7 +80,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/configuracoes': typeof ConfiguracoesRoute
   '/estoque': typeof EstoqueRoute
-  '/fichas': typeof FichasRoute
   '/ia': typeof IaRoute
   '/insumos': typeof InsumosRoute
   '/login': typeof LoginRoute
@@ -100,7 +92,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/configuracoes': typeof ConfiguracoesRoute
   '/estoque': typeof EstoqueRoute
-  '/fichas': typeof FichasRoute
   '/ia': typeof IaRoute
   '/insumos': typeof InsumosRoute
   '/login': typeof LoginRoute
@@ -114,7 +105,6 @@ export interface FileRouteTypes {
     | '/'
     | '/configuracoes'
     | '/estoque'
-    | '/fichas'
     | '/ia'
     | '/insumos'
     | '/login'
@@ -126,7 +116,6 @@ export interface FileRouteTypes {
     | '/'
     | '/configuracoes'
     | '/estoque'
-    | '/fichas'
     | '/ia'
     | '/insumos'
     | '/login'
@@ -138,7 +127,6 @@ export interface FileRouteTypes {
     | '/'
     | '/configuracoes'
     | '/estoque'
-    | '/fichas'
     | '/ia'
     | '/insumos'
     | '/login'
@@ -151,7 +139,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ConfiguracoesRoute: typeof ConfiguracoesRoute
   EstoqueRoute: typeof EstoqueRoute
-  FichasRoute: typeof FichasRoute
   IaRoute: typeof IaRoute
   InsumosRoute: typeof InsumosRoute
   LoginRoute: typeof LoginRoute
@@ -204,13 +191,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IaRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/fichas': {
-      id: '/fichas'
-      path: '/fichas'
-      fullPath: '/fichas'
-      preLoaderRoute: typeof FichasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/estoque': {
       id: '/estoque'
       path: '/estoque'
@@ -239,7 +219,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConfiguracoesRoute: ConfiguracoesRoute,
   EstoqueRoute: EstoqueRoute,
-  FichasRoute: FichasRoute,
   IaRoute: IaRoute,
   InsumosRoute: InsumosRoute,
   LoginRoute: LoginRoute,
@@ -250,3 +229,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
