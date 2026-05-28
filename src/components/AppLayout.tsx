@@ -35,7 +35,6 @@ const navItems = [
   { to: "/estoque", label: "Estoque & Insumos", icon: Warehouse },
   { to: "/vendas", label: "Vendas", icon: Receipt },
   { to: "/desperdicios", label: "Desperdícios", icon: Recycle },
-  { to: "/relatorios", label: "Relatórios", icon: FileBarChart2 },
   { to: "/ia", label: "Inteligência", icon: Sparkles },
   { to: "/configuracoes", label: "Configurações", icon: Settings },
 ];
