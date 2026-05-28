@@ -32,9 +32,9 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 const navItems = [
   { to: "/", label: "Dashboard", icon: LayoutDashboard },
   { to: "/produtos", label: "Produtos", icon: ChefHat },
-  { to: "/insumos", label: "Insumos", icon: Package },
-  { to: "/estoque", label: "Estoque", icon: Warehouse },
+  { to: "/estoque", label: "Estoque & Insumos", icon: Warehouse },
   { to: "/vendas", label: "Vendas", icon: Receipt },
+  { to: "/desperdicios", label: "Desperdícios", icon: Recycle },
   { to: "/relatorios", label: "Relatórios", icon: FileBarChart2 },
   { to: "/ia", label: "Inteligência", icon: Sparkles },
   { to: "/configuracoes", label: "Configurações", icon: Settings },

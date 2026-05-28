@@ -5,14 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Warehouse, Package, AlertTriangle, TrendingDown, Plus } from "lucide-react";
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 
 export const Route = createFileRoute("/estoque")({ component: Estoque });
-
-const consumo = [
-  { d: "01", kg: 42 }, { d: "05", kg: 58 }, { d: "10", kg: 51 }, { d: "15", kg: 73 },
-  { d: "20", kg: 66 }, { d: "25", kg: 84 }, { d: "30", kg: 92 },
-];
 
 const movs = [
   { item: "Queijo Mussarela", entrada: 30, saida: 18, saldo: 12, dias: 4, status: "critico" },
@@ -55,30 +49,6 @@ function Estoque() {
           </Card>
         ))}
       </div>
-
-      <Card className="rounded-2xl border-slate-200 shadow-sm mb-6">
-        <CardHeader>
-          <CardTitle className="text-base">Consumo de insumos no mês</CardTitle>
-          <p className="text-xs text-slate-500">Quilos totais consumidos (descontados automaticamente pelas vendas)</p>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={220}>
-            <AreaChart data={consumo}>
-              <defs>
-                <linearGradient id="cg" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#2563eb" stopOpacity={0.35} />
-                  <stop offset="100%" stopColor="#2563eb" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-              <XAxis dataKey="d" stroke="#94a3b8" fontSize={12} />
-              <YAxis stroke="#94a3b8" fontSize={12} />
-              <Tooltip contentStyle={{ borderRadius: 12, border: "1px solid #e2e8f0", fontSize: 12 }} />
-              <Area type="monotone" dataKey="kg" stroke="#2563eb" strokeWidth={2} fill="url(#cg)" />
-            </AreaChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
 
       <Card className="rounded-2xl border-slate-200 shadow-sm">
         <CardHeader className="flex flex-row items-center justify-between">

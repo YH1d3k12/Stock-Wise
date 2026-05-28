@@ -16,6 +16,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as InsumosRouteImport } from './routes/insumos'
 import { Route as IaRouteImport } from './routes/ia'
 import { Route as EstoqueRouteImport } from './routes/estoque'
+import { Route as DesperdiciosRouteImport } from './routes/desperdicios'
 import { Route as ConfiguracoesRouteImport } from './routes/configuracoes'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -54,6 +55,11 @@ const EstoqueRoute = EstoqueRouteImport.update({
   path: '/estoque',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DesperdiciosRoute = DesperdiciosRouteImport.update({
+  id: '/desperdicios',
+  path: '/desperdicios',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ConfiguracoesRoute = ConfiguracoesRouteImport.update({
   id: '/configuracoes',
   path: '/configuracoes',
@@ -68,6 +74,7 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/configuracoes': typeof ConfiguracoesRoute
+  '/desperdicios': typeof DesperdiciosRoute
   '/estoque': typeof EstoqueRoute
   '/ia': typeof IaRoute
   '/insumos': typeof InsumosRoute
@@ -79,6 +86,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/configuracoes': typeof ConfiguracoesRoute
+  '/desperdicios': typeof DesperdiciosRoute
   '/estoque': typeof EstoqueRoute
   '/ia': typeof IaRoute
   '/insumos': typeof InsumosRoute
@@ -91,6 +99,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/configuracoes': typeof ConfiguracoesRoute
+  '/desperdicios': typeof DesperdiciosRoute
   '/estoque': typeof EstoqueRoute
   '/ia': typeof IaRoute
   '/insumos': typeof InsumosRoute
@@ -104,6 +113,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/configuracoes'
+    | '/desperdicios'
     | '/estoque'
     | '/ia'
     | '/insumos'
@@ -115,6 +125,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/configuracoes'
+    | '/desperdicios'
     | '/estoque'
     | '/ia'
     | '/insumos'
@@ -126,6 +137,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/configuracoes'
+    | '/desperdicios'
     | '/estoque'
     | '/ia'
     | '/insumos'
@@ -138,6 +150,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ConfiguracoesRoute: typeof ConfiguracoesRoute
+  DesperdiciosRoute: typeof DesperdiciosRoute
   EstoqueRoute: typeof EstoqueRoute
   IaRoute: typeof IaRoute
   InsumosRoute: typeof InsumosRoute
@@ -198,6 +211,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EstoqueRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/desperdicios': {
+      id: '/desperdicios'
+      path: '/desperdicios'
+      fullPath: '/desperdicios'
+      preLoaderRoute: typeof DesperdiciosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/configuracoes': {
       id: '/configuracoes'
       path: '/configuracoes'
@@ -218,6 +238,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConfiguracoesRoute: ConfiguracoesRoute,
+  DesperdiciosRoute: DesperdiciosRoute,
   EstoqueRoute: EstoqueRoute,
   IaRoute: IaRoute,
   InsumosRoute: InsumosRoute,
