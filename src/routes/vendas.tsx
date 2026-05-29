@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
   Receipt, TrendingUp, DollarSign, ShoppingBag, Upload, CheckCircle2,
@@ -16,7 +15,7 @@ import {
 } from "lucide-react";
 import {
   RadialBarChart, RadialBar, PolarAngleAxis,
-  PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid,
 } from "recharts";
 
 export const Route = createFileRoute("/vendas")({ component: Vendas });
@@ -44,7 +43,7 @@ type Ingrediente = { insumoId: string; qtd: number };
 const catalogoProdutos: Record<string, {
   nome: string; cat: string; preco: number; emoji: string;
   ingredientes: Ingrediente[];
-  desperdicio: number; // % estimado de desperdício do produto (0-1)
+  desperdicio: number;
 }> = {
   "Pizza Calabresa": {
     nome: "Pizza Calabresa", cat: "Pizzas", preco: 49.9, emoji: "🍕",
@@ -156,7 +155,7 @@ function parseCSV(texto: string): LinhaCSV[] {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// MODAL DE DETALHE DE VENDA — splitter esq/dir
+// MODAL DE DETALHE DE VENDA
 // ─────────────────────────────────────────────────────────────────────────
 function DetalheVendaModal({ venda, onClose }: { venda: Venda | null; onClose: () => void }) {
   if (!venda) return null;
@@ -165,20 +164,11 @@ function DetalheVendaModal({ venda, onClose }: { venda: Venda | null; onClose: (
   const margem = venda.valor > 0 ? (venda.lucro / venda.valor) * 100 : 0;
   const cmv = venda.valor > 0 ? (venda.custo / venda.valor) * 100 : 0;
 
-  // Desperdício estimado
   const taxaDesperdicio = p?.desperdicio ?? 0;
   const custoDesperdicio = venda.custo * taxaDesperdicio;
   const lucroReal = venda.lucro - custoDesperdicio;
   const margemReal = venda.valor > 0 ? (lucroReal / venda.valor) * 100 : 0;
 
-  // Dados do gráfico de pizza: composição do preço de venda
-  const pieData = [
-    { name: "Lucro real", value: parseFloat(lucroReal.toFixed(2)), fill: "#10b981" },
-    { name: "Custo insumos", value: parseFloat(venda.custo.toFixed(2)), fill: "#6366f1" },
-    { name: "Desperdício", value: parseFloat(custoDesperdicio.toFixed(2)), fill: "#f59e0b" },
-  ];
-
-  // Dados do gráfico de barras: insumos por custo total
   const barData = p?.ingredientes.map((ing) => {
     const ins = insumosCatalog[ing.insumoId];
     return {
@@ -187,7 +177,6 @@ function DetalheVendaModal({ venda, onClose }: { venda: Venda | null; onClose: (
     };
   }).sort((a, b) => b.custo - a.custo) ?? [];
 
-  // Gauge margem
   const gaugeData = [{ value: margem, fill: margem >= 60 ? "#10b981" : margem >= 40 ? "#f59e0b" : "#ef4444" }];
 
   return (
@@ -203,7 +192,6 @@ function DetalheVendaModal({ venda, onClose }: { venda: Venda | null; onClose: (
               {venda.origem && <span className="ml-2 bg-orange-500/20 text-orange-300 rounded px-1.5 py-0.5 text-[10px]">{venda.origem}</span>}
             </p>
           </div>
-          {/* KPIs inline no header */}
           <div className="hidden sm:flex gap-4">
             {[
               { l: "Faturado", v: brl(venda.valor), c: "text-white" },
@@ -309,12 +297,55 @@ function DetalheVendaModal({ venda, onClose }: { venda: Venda | null; onClose: (
             </div>
           </div>
 
-          {/* ── Lado direito: dashboard ── */}
+          {/* ── Lado direito: dashboard simplificado ── */}
           <div className="flex-1 overflow-y-auto bg-slate-50 p-5 space-y-4">
 
-            {/* Gauge de margem */}
+            {/* Custo por insumo + desperdício + lucro real */}
             <div className="bg-white rounded-2xl border border-slate-200 p-4">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Margem bruta</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">
+                Custo por insumo (R$)
+              </p>
+              <ResponsiveContainer width="100%" height={160}>
+                <BarChart data={barData} layout="vertical" margin={{ left: 4, right: 8, top: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
+                  <XAxis type="number" fontSize={10} stroke="#94a3b8" tickFormatter={(v) => `R$${v.toFixed(2)}`} />
+                  <YAxis type="category" dataKey="nome" fontSize={10} stroke="#94a3b8" width={60} />
+                  <Tooltip
+                    contentStyle={{ borderRadius: 10, border: "1px solid #e2e8f0", fontSize: 11 }}
+                    formatter={(val: number) => brl(val)}
+                  />
+                  <Bar dataKey="custo" fill="#6366f1" radius={[0, 6, 6, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+
+              {/* Desperdício e lucro real abaixo do gráfico */}
+              <div className="mt-3 pt-3 border-t border-slate-100 grid grid-cols-2 gap-3">
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <Flame className="h-3.5 w-3.5 text-amber-500" />
+                    <p className="text-xs font-semibold text-amber-700">Desperdício estimado</p>
+                  </div>
+                  <p className="text-lg font-bold text-amber-800">{brl(custoDesperdicio)}</p>
+                  <p className="text-[10px] text-amber-600 mt-0.5">
+                    {(taxaDesperdicio * 100).toFixed(0)}% do custo de insumos
+                  </p>
+                </div>
+                <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <TrendingUp className="h-3.5 w-3.5 text-emerald-500" />
+                    <p className="text-xs font-semibold text-emerald-700">Lucro real</p>
+                  </div>
+                  <p className="text-lg font-bold text-emerald-800">{brl(lucroReal)}</p>
+                  <p className="text-[10px] text-emerald-600 mt-0.5">Após descontar desperdício</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Margem de lucro */}
+            <div className="bg-white rounded-2xl border border-slate-200 p-4">
+              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">
+                Margem de lucro
+              </p>
               <div className="flex items-center gap-4">
                 <div className="h-24 w-24 shrink-0">
                   <ResponsiveContainer width="100%" height="100%">
@@ -332,77 +363,13 @@ function DetalheVendaModal({ venda, onClose }: { venda: Venda | null; onClose: (
                   <p className={`text-3xl font-bold ${margem >= 60 ? "text-emerald-600" : margem >= 40 ? "text-amber-500" : "text-red-500"}`}>
                     {margem.toFixed(1)}%
                   </p>
-                  <p className="text-xs text-slate-500 mt-0.5">CMV: <span className="font-semibold text-slate-700">{cmv.toFixed(1)}%</span></p>
-                  <p className="text-xs text-slate-500">Qtd: <span className="font-semibold text-slate-700">{venda.qtd} unidades</span></p>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Margem real: <span className="font-semibold text-slate-700">{margemReal.toFixed(1)}%</span>
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    CMV: <span className="font-semibold text-slate-700">{cmv.toFixed(1)}%</span>
+                  </p>
                 </div>
-              </div>
-            </div>
-
-            {/* Composição do valor — pizza */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-4">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">Composição do faturamento</p>
-              <div className="flex items-center gap-4">
-                <div className="h-36 w-36 shrink-0">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie data={pieData} dataKey="value" innerRadius={38} outerRadius={62} paddingAngle={3}>
-                        {pieData.map((entry) => <Cell key={entry.name} fill={entry.fill} />)}
-                      </Pie>
-                      <Tooltip
-                        contentStyle={{ borderRadius: 10, border: "1px solid #e2e8f0", fontSize: 11 }}
-                        formatter={(val: number) => brl(val)}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="flex-1 space-y-2">
-                  {pieData.map((d) => (
-                    <div key={d.name} className="flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-1.5">
-                        <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ background: d.fill }} />
-                        <span className="text-slate-600">{d.name}</span>
-                      </div>
-                      <span className="font-semibold text-slate-800">{brl(d.value)}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Custo por insumo — barras */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-4">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">Custo por insumo (R$)</p>
-              <ResponsiveContainer width="100%" height={140}>
-                <BarChart data={barData} layout="vertical" margin={{ left: 4, right: 8, top: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
-                  <XAxis type="number" fontSize={10} stroke="#94a3b8" tickFormatter={(v) => `R$${v.toFixed(2)}`} />
-                  <YAxis type="category" dataKey="nome" fontSize={10} stroke="#94a3b8" width={60} />
-                  <Tooltip
-                    contentStyle={{ borderRadius: 10, border: "1px solid #e2e8f0", fontSize: 11 }}
-                    formatter={(val: number) => brl(val)}
-                  />
-                  <Bar dataKey="custo" fill="#6366f1" radius={[0, 6, 6, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-
-            {/* Cards de alerta desperdício */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3">
-                <div className="flex items-center gap-1.5 mb-1">
-                  <Flame className="h-4 w-4 text-amber-500" />
-                  <p className="text-xs font-semibold text-amber-700">Desperdício</p>
-                </div>
-                <p className="text-xl font-bold text-amber-800">{brl(custoDesperdicio)}</p>
-                <p className="text-[10px] text-amber-600 mt-0.5">{(taxaDesperdicio * 100).toFixed(0)}% do custo de insumos</p>
-              </div>
-              <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-3">
-                <div className="flex items-center gap-1.5 mb-1">
-                  <TrendingUp className="h-4 w-4 text-emerald-500" />
-                  <p className="text-xs font-semibold text-emerald-700">Lucro real</p>
-                </div>
-                <p className="text-xl font-bold text-emerald-800">{brl(lucroReal)}</p>
-                <p className="text-[10px] text-emerald-600 mt-0.5">Margem real: {margemReal.toFixed(1)}%</p>
               </div>
             </div>
 
@@ -592,14 +559,7 @@ function Vendas() {
 
   return (
     <AppLayout title="Vendas" subtitle="Cada venda, seu custo real e o lucro gerado">
-      <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
-        <Tabs defaultValue="dia">
-          <TabsList className="bg-white border border-slate-200">
-            <TabsTrigger value="dia">Hoje</TabsTrigger>
-            <TabsTrigger value="semana">Semana</TabsTrigger>
-            <TabsTrigger value="mes">Mês</TabsTrigger>
-          </TabsList>
-        </Tabs>
+      <div className="flex items-center justify-end mb-6 gap-4 flex-wrap">
         <div className="flex gap-2">
           <input ref={inputRef} type="file" accept=".csv" className="hidden" onChange={handleArquivo} />
           <Button variant="outline" className="border-blue-300 text-blue-700 hover:bg-blue-50" onClick={() => inputRef.current?.click()} disabled={carregando}>
